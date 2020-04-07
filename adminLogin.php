@@ -1,6 +1,18 @@
 <?php
     
     include("dbconnect.php");
+    session_start();
+
+    if(isset($_SESSION['admin_id']) || isset($_COOKIE['admin_id']))
+    
+    {
+
+        header("Location:/spl/adminLogin");
+
+
+    }
+
+
 
     
     $sucess="";
@@ -42,7 +54,7 @@
         if($result1 == 1 && $result2 == 1)
         {
 
-            session_start();
+            
             if($_POST['check'])
             {
 
@@ -55,7 +67,7 @@
             
             $_SESSION['admin_id']=$id;
             $_SESSION['password']=$logPassword;
-            header("Location:login.php");
+            header("Location:adminLogin");
 
         }
 
@@ -249,8 +261,8 @@
         
         <div class="col-md-5 pr-lg-5" style="margin-bottom: 1rem;">
             <img src="logo.png" alt="" class="img-fluid mb-3 d-none d-md-block" style="margin-left:6rem;">
-            <div class="display-4 text-white text-center mx-4 mb-3 mr-5 text-center" style="font-size:50px;">Login</div>
-            <p class="white text-muted mx-3 mb-0 mr-5 text-center">Only For Admin</p>
+            <div class="display-4 text-white text-center mb-3 mr-5 text-center" style="font-size:50px; margin-left:0.7em;">Login</div>
+            <p class="white text-muted mb-0 mr-5 text-center" style="margin-left: 2.1em;">Only For Admin</p>
         </div>
 
         <!-- Registration Form -->
