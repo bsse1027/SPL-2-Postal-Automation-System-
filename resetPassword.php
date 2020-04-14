@@ -108,6 +108,8 @@
         else{
 
             $error=$error."Your session has expired.<br>";
+            header("Location:facultyLogin.php?expire=1");
+            exit();
 
 
 

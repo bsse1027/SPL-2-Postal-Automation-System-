@@ -7,11 +7,19 @@
     $error="";
     $errorFlag=0;
 
+
+    if(isset($_GET['expire']) && $_GET['expire']==1){
+
+        $error=$error."Your session has been expired";
+
+    }
+
     if (isset($_POST['log_in'])) {
-        
-        
+
         $id=mysqli_real_escape_string($link,$_POST['teacher_id']);
         $logPassword=md5(mysqli_real_escape_string($link,$_POST['password']));
+
+        
 
         $idQuery="
         
@@ -37,39 +45,70 @@
         $result1 = mysqli_num_rows($idAunthenticate);
         $result2=mysqli_num_rows($passwordAunthenticate);
 
+        if( $result1 == 0){
 
-
-        if($result1 == 1 && $result2 == 1)
-        {
-
-            session_start();
-            if($_POST['check'])
-            {
-
-                setcookie("teacher_id","$id",time()+86400*30,"/");
-                setcookie("password","$logPassword",time()+ 86400*30,"/");
-
-            }
             
+                $error=$error. "The ID doesn't exist.<br>";
             
-            
-            $_SESSION['teacher_id']=$id;
-            $_SESSION['password']=$logPassword;
-            header("Location:login.php");
-
-        }
-
-        else if( $result1 == 0){
-
-            $error=$error. "The ID doesn't exist.<br>";
 
         }
 
         else if( $result2 == 0){
 
-            $error=$error. "The password is wrong.Please try again.<br>";
+            
+                $error=$error. "The password is wrong.Please try again.<br>";
+            
 
         }
+
+
+
+        else if($result1 == 1 && $result2 == 1)
+        {
+
+            $statusQuery="
+    
+                SELECT status FROM `signedfaculty`
+                WHERE teacher_id=$id;
+                
+                ";
+            
+                $resultStat=mysqli_query($link,$statusQuery);
+                $row=mysqli_fetch_array($resultStat);
+            
+                if($row['status'] == 0)
+                {
+            
+                    $error=$error."You are not verified yet.<br>";
+                    $errorFlag++;
+            
+            
+                } 
+
+
+                if($errorFlag==0)
+                {
+                    session_start();
+                    if($_POST['check'])
+                    {
+
+                        setcookie("teacher_id","$id",time()+86400*30,"/");
+                        setcookie("password","$logPassword",time()+ 86400*30,"/");
+
+                    }
+                    
+                    
+                    
+                    $_SESSION['teacher_id']=$id;
+                    $_SESSION['password']=$logPassword;
+                    header("Location:login.php");
+
+                }
+            
+
+        }
+
+        
 
 
 
@@ -249,8 +288,8 @@
         
         <div class="col-md-5 pr-lg-5" style="margin-bottom: 6rem;">
             <img src="logo.png" alt="" class="img-fluid mb-3 d-none d-md-block" style="margin-left:6rem;">
-            <div class="display-4 text-white text-center mx-4 mb-3 mr-5 text-center" style="font-size:50px;">Login</div>
-            <p class="white text-muted mx-3 mb-0 mr-5 text-center">Only For Faculties</p>
+            <div class="display-4 text-white text-center mb-3 mr-5 text-center" style="font-size:50px; margin-left:0.7em;">Login</div>
+            <p class="white text-muted mb-0 mr-5 text-center" style="margin-left: 2.1em;">Only For Faculties</p>
         </div>
 
         <!-- Registration Form -->

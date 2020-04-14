@@ -321,7 +321,7 @@
         <div class="col-md-5 pr-lg-5" style="margin-bottom: 6rem;">
             <img src="logo.png" alt="" class="img-fluid mb-3 d-none d-md-block" style="margin-left:6rem;">
             <div class="display-4 text-white text-center" style="font-size:50px;">Create an Account</div>
-            <p class="white text-muted mx-3 mb-0 mr-5 text-center">Only For Faculties.</p>
+            <p class="white text-muted mb-0 mr-5 text-center" style="margin-left: 2.1em;">Only For Faculties.</p>
         </div>
 
         <!-- Registration Form -->
