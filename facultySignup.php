@@ -9,20 +9,20 @@
 
     if(isset($_POST['create']))
     {
-        if($_POST['firstname'] == "")
+        if($_POST['firstname_english'] == "")
         
         {
 
             $errorFlag++;
-            $error=$error."You need to provide your first name.<br>";
+            $error=$error."You need to provide your name in English.<br>";
 
         }
     
-        else if($_POST['lastname'] == "")
+        else if($_POST['firstname_bangla'] == "")
         
         {
             $errorFlag++;
-            $error=$error."You need to provide your last name.<br>";
+            $error=$error."You need to provide your name in Bangla.<br>";
 
         }
         else if($_POST['teacher_id'] == ""  || !is_numeric( $_POST['teacher_id']) )
@@ -39,6 +39,14 @@
         {
             $errorFlag++;
             $error=$error."You need to provide your insitution/department name.<br>";
+
+        }
+
+        else if($_POST['designation'] == "")
+        
+        {
+            $errorFlag++;
+            $error=$error."You need to provide your Designation.<br>";
 
         }
         else if($_POST['email'] == "")
@@ -85,12 +93,13 @@
          }
 
         $email=mysqli_real_escape_string($link,$_POST['email']);
-        $firstname=mysqli_real_escape_string($link,$_POST['firstname']);
-        $lastname=mysqli_real_escape_string($link,$_POST['lastname']);
+        $firstname=mysqli_real_escape_string($link,$_POST['firstname_english']);
+        $lastname=mysqli_real_escape_string($link,$_POST['firstname_bangla']);
         $id=mysqli_real_escape_string($link,$_POST['teacher_id']);
         $dept=mysqli_real_escape_string($link,$_POST['dept_name']);
         $phone=mysqli_real_escape_string($link,$_POST['phone']);
         $password=md5(mysqli_real_escape_string($link,$_POST['password'])) ;
+        $designation=mysqli_real_escape_string($link,$_POST['designation']);
 
 
         $tempQuery='SELECT * FROM `signedfaculty` WHERE email="'.$email.'"';
@@ -121,7 +130,7 @@
         {
             $query="
 
-            INSERT INTO `signedfaculty` (`teacher_id`, `first_name`, `last_name`, `dept`, `email`, `phone`, `password`) VALUES ('$id', '$firstname', '$lastname', '$dept', '$email', '$phone', '$password')
+            INSERT INTO `signedfaculty` (`teacher_id`, `nameEng`, `nameBang`, `dept`,`designation`, `email`, `phone`, `password`) VALUES ('$id', '$firstname', '$lastname', '$dept','$designation', '$email', '$phone', '$password')
             LIMIT 1
             
             ";
@@ -330,23 +339,23 @@
                 <div class="row">
 
                     <!-- First Name -->
-                    <div class="input-group col-lg-6 mb-4">
+                    <div class="input-group col-lg-12 mb-4">
                         <div class="input-group-prepend">
                             <span class="input-group-text bg-white px-4 border-md border-right-0">
                                 <i class="fa fa-user text-muted"></i>
                             </span>
                         </div>
-                        <input id="firstName" type="text" name="firstname" placeholder="First Name" class="form-control bg-white border-left-0 border-md">
+                        <input id="firstName" type="text" name="firstname_english" placeholder="Name (English)" class="form-control bg-white border-left-0 border-md">
                     </div>
 
-                    <!-- Last Name -->
-                    <div class="input-group col-lg-6 mb-4">
+                    <!-- First Name(in Bangla) -->
+                    <div class="input-group col-lg-12 mb-4">
                         <div class="input-group-prepend">
                             <span class="input-group-text bg-white px-4 border-md border-right-0">
                                 <i class="fa fa-user text-muted"></i>
                             </span>
                         </div>
-                        <input id="lastName" type="text" name="lastname" placeholder="Last Name" class="form-control bg-white border-left-0 border-md">
+                        <input id="firstName" type="text" name="firstname_bangla" placeholder="নাম (বাংলা) " class="form-control bg-white border-left-0 border-md">
                     </div>
 
                     <!-- Teacher ID -->
@@ -358,6 +367,24 @@
                             </span>
                         </div>
                         <input id="teacherId" type="text" name="teacher_id" placeholder="Teacher ID" class="form-control bg-white border-left-0 border-md">
+                    </div>
+
+
+                    <!-- Designation -->
+                    
+                    <div class="input-group col-lg-12 mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-md border-right-0">
+                                    <i class="fas fa-user-tie text-muted"></i>
+                            </span>
+                        </div>
+                        <select id="desig" name="designation" class="form-control bg-white border-left-0 border-md h-100 font-weight-bold text-muted">
+                            <option value="" hidden selected>Designation</option>
+                            <option value="প্রভাষক">Lecturer</option>
+                            <option value="সহকারী অধ্যাপক">Assistant Professor</option>
+                            <option value="সহযোগী অধ্যাপক">Associate Professor</option>
+                            <option value="অধ্যাপক">Professor</option>
+                        </select>
                     </div>
 
                     <!-- Institue/Dept -->
