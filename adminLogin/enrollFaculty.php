@@ -3,6 +3,8 @@
   include("../dbconnect.php");
 
   session_start();
+  $error="";
+  $errorFlag=0;
   
 
   if(empty($_SESSION['admin_id']) && empty($_COOKIE['admin_id']))
@@ -29,28 +31,114 @@
 
   }
 
-                      if(isset($_GET['tid']))
-                            {
-                                $tid=$_GET['tid'];
-                                $tempQuery2="
-                                
-                                UPDATE `signedfaculty`
-                                SET status=1
-                                WHERE teacher_id=$tid
-                                LIMIT 1;
-                                
-                                ";
+  if(isset($_POST['add']))
+  {
+    $tid=$_POST['tid'];
+    $nameEng=$_POST['name_eng'];
+    $nameBang=$_POST['name_bang'];
+    $email=$_POST['email'];
+    $dept=$_POST['dept'];
+    $designation=$_POST['designation'];
+    $phone=$_POST['phone'];
 
-                                
+    if($nameEng == "")
+        
+        {
 
-                                mysqli_query($link,$tempQuery2);
-                                header('location:verify.php');
-                                
-                                
-                                
-                                
+            $errorFlag++;
+            $error=$error."You need to provide name in English.";
 
-                            }
+        }
+    
+        else if($nameBang == "")
+        
+        {
+            $errorFlag++;
+            $error=$error."You need to provide name in Bangla.";
+
+        }
+        else if($tid == ""  || !is_numeric( $tid) )
+        
+        {
+            $errorFlag++;
+            $error=$error."You need to provide a valid teacher ID.";
+
+        }
+
+
+        else if($dept == "")
+        
+        {
+            $errorFlag++;
+            $error=$error."You need to provide insitution/department name.";
+
+        }
+
+        else if($designation== "")
+        
+        {
+            $errorFlag++;
+            $error=$error."You need to provide valid Designation.";
+
+        }
+        else if($email == "")
+        
+        {
+            $errorFlag++;
+            $error=$error."You need to provide a valid email address.";
+
+        }
+
+        else if($phone == "")
+        
+        {
+            $errorFlag++;
+            $error=$error."You need to provide an active phone number.";
+
+        }
+
+        
+
+        else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errorFlag++;
+            $error=$error."Invalid email address.\n";
+         }
+
+
+        $tempQuery='SELECT * FROM `allfaculty` WHERE email="'.$email.'"';
+      
+        $temp=mysqli_query($link,$tempQuery);
+        
+        if(mysqli_num_rows($temp) > 0)
+        {
+              $errorFlag++;
+              $error=$error."This email is already taken.";
+        }
+
+        $tempQuery='SELECT * FROM `allfaculty` WHERE teacher_id="'.$tid.'"';
+      
+        $temp=mysqli_query($link,$tempQuery);
+        
+        if(mysqli_num_rows($temp) > 0)
+        {
+              $errorFlag++;
+              $error=$error."This teacher already exists.";
+        }
+
+        if($errorFlag==0)
+        {
+            $query="
+            INSERT INTO `allfaculty`(`teacher_id`, `nameEng`, `nameBang`, `email`, `dept`, `designation`, `phone`) VALUES ('$tid','$nameEng','$nameBang','$email','$dept','$designation','$phone')
+            
+            ";
+        
+            mysqli_query($link,$query);
+
+        }
+
+    
+    
+  }
 
 
 
@@ -92,17 +180,33 @@
   <!-- Custom styles for this page -->
   <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.css"/>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
  
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.js"></script>
 
+ <?php
  
+ if(!empty($error))
+ {
+    echo '
+ 
+    <script>
+    
+    alert("'.$error.'")
+    
+    
+    </script>';
 
+ }
+ 
+ 
+ 
+ ?>
+            
+      
   
 
 </head>
-
-<body id="page-top">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -143,11 +247,11 @@
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">You can:</h6>
-            <a class="collapse-item active" href="verify.php"><i class="fas fa-user-check"></i>
+            <a class="collapse-item" href="verify.php"><i class="fas fa-user-check"></i>
           <span> Verify Faculties</span></a>
           <a class="collapse-item" href="updateFaculty.php"><i class="fas fa-user-edit"></i>
           <span> Update Faculties</span></a>
-          <a class="collapse-item" href="enrollFaculty.php"><i class="fas fa-user-edit"></i>
+          <a class="collapse-item active" href="enrollFaculty.php"><i class="fas fa-user-edit"></i>
           <span> Add New Faculties</span></a>
           </div>
         </div>
@@ -168,7 +272,6 @@
           </div>
         </div>
       </li>
-
       
 
       <!-- Divider -->
@@ -191,15 +294,12 @@
         <!-- Topbar -->
         <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
-          <!-- Sidebar Toggle (Topbar) -->
-          <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-            <i class="fa fa-bars"></i>
-          </button>
-
-         
+          
 
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
+
+            
 
             <div class="topbar-divider d-none d-sm-block"></div>
 
@@ -239,14 +339,17 @@
         <!-- Begin Page Content -->
         <div class="container-fluid">
 
+
+        
+
           <!-- Page Heading -->
-          <h1 class="h3 mb-2 text-gray-800 text-center">Faculty Lists</h1>
-          <p class="mb-4 text-center">See faculty lists to know which faculty is needed to be verified.</p>
+          <h1 class="h3 mb-2 text-gray-800 text-center">Add a new faculty</h1>
+          <p class="mb-4 text-center">Add a newly enorolled faculties information to our existing database.</p>
 
           <!-- DataTales Example -->
           <div class="card shadow mb-4">
             <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary text-center">Faculties</h6>
+              <h6 class="m-0 font-weight-bold text-primary text-center">Add new Faculties</h6>
             </div>
             <div class="card-body">
               <div class="table-responsive">
@@ -260,100 +363,64 @@
                       <th>Designation</th>
                       <th>Email address</th>
                       <th>Phone Number</th>
-                      <th>Status</th>
+                      <th></th>
+                      
                     </tr>
                   </thead>
 
                   <tbody>
                       <?php
-                      
-                      
-
-                      $tempQuery="
-                      
-                      SELECT * FROM `signedfaculty`
-                      
-                      
-                      ";
-
-                      $result=mysqli_query($link,$tempQuery);
-                      while($row=mysqli_fetch_array($result))
-
-                      {
 
                         
                         echo "<tr>
+
+                        <form method='post'>
                         
-                        <td>".$row['teacher_id']."</td>
-                        <td>".$row['nameEng']."</td>
-                        <td>".$row['nameBang']."</td>
-                        <td>".$row['dept']."</td>
-                        <td>".$row['designation']."</td>
-                        <td>".$row['email']."</td>
-                        <td>".$row['phone']."</td>
+                        <td><input name='tid' type='text'></td>
+                        <td><input name='name_eng' type='text'></td>
+                        <td><input name='name_bang' type='text'></td>
+                        <td><input name='dept' type='text'></td>
+                        <td><select id='desig' name='designation' class='form-control bg-white' style='font-size:13px;'>
+                        <option value='' hidden selected></option>
+                        <option value='প্রভাষক'>প্রভাষক </option>
+                        <option value='সহকারী অধ্যাপক'>সহকারী অধ্যাপক</option>
+                        <option value='সহযোগী অধ্যাপক'>সহযোগী অধ্যাপক</option>
+                        <option value='অধ্যাপক'>অধ্যাপক</option>
+                    </select> </td>
+                        <td><input name='email' type='email'></td>
+                        <td><input name='phone' type='text'></td>
                        
                         
                         ";
 
-                        if($row['status'] ==0)
-                        {
-                            
-                            
-                          $tid=$row['teacher_id'];
+                        echo "
                         
-                          echo "<td class='x'>
+                        <td>
 
-                            
-                            
-                            
-                            <a href='verify.php?tid=$tid' class='btn btn-danger text-center' style='font-size:13px;'>Verify</a>
-                            
-                           
+                        <button type='submit' name='add' class='btn btn-primary text-center' style='font-size:13px;'>Add</button>
 
-                            </td>";
-                            
-                            
-
-                            
-
-                           
-
-
-                        }
-                        else if($row['status']==1)
-                        {
-                            echo "
-                            
-                            <td class='text-center text-success'>
-
-                                <strong>Verified</strong>
-                            
-                            </td>
-                            
-                            ";
-                        }
-
-                        $tid='';
-
-                      }
-                      
-                      
-                      
-                      ?>
+                        
+                        
+                        </td>
+                        </form>
+                        
+                        
+                        ";
+                        ?>
                       </tr>
                       
                   </tbody>
 
                   <tfoot>
                     <tr>
-                    <th>Teacher ID</th>
+                      <th>Teacher ID</th>
                       <th>Name(English)</th>
                       <th>Name(Bangla)</th>
                       <th>Department/Institute</th>
                       <th>Designation</th>
                       <th>Email address</th>
                       <th>Phone Number</th>
-                      <th>Status</th>
+                      <th></th>
                     </tr>
                   </tfoot>
                 </table>

@@ -29,29 +29,91 @@
 
   }
 
-                      if(isset($_GET['tid']))
-                            {
-                                $tid=$_GET['tid'];
-                                $tempQuery2="
-                                
-                                UPDATE `signedfaculty`
-                                SET status=1
-                                WHERE teacher_id=$tid
-                                LIMIT 1;
-                                
-                                ";
+  $sucess="";
+    $error="";
+    $errorFlag=0;
 
-                                
+    if(isset($_POST['reset']))
+    {
+        
+    
+        
+        if($_POST['staff_id'] == ""  || !is_numeric( $_POST['staff_id']) )
+        
+        {
+            $errorFlag++;
+            $error=$error."You need to provide a valid staff ID.<br>";
 
-                                mysqli_query($link,$tempQuery2);
-                                header('location:verify.php');
-                                
-                                
-                                
-                                
+        }
 
-                            }
 
+        else if($_POST['password'] == "")
+        
+        {
+            $errorFlag++;
+            $error=$error."You need to provide a new password.<br>";
+
+        }
+
+        else if($_POST['password_conf'] == "")
+        
+        {
+            $errorFlag++;
+            $error=$error."You need to confirm the new password.<br>";
+
+        }
+
+        else if($_POST['password'] != $_POST['password_conf'])
+        {
+            $errorFlag++;
+            $error=$error."Your confirmed password didn't match.<br>";
+        }
+
+       
+        $id=mysqli_real_escape_string($link,$_POST['staff_id']);
+        $password=md5(mysqli_real_escape_string($link,$_POST['password'])) ;
+        
+        $tempQuery='SELECT * FROM `staff` WHERE staff_id="'.$id.'"';
+      
+        $temp=mysqli_query($link,$tempQuery);
+        
+        if(mysqli_num_rows($temp) == 0)
+        {
+              $errorFlag++;
+              $error=$error."This Staff ID is invalid / This Staff ID is not registered";
+        }
+
+
+
+
+        if($errorFlag == 0)
+
+        {
+            $query="
+
+            UPDATE `staff`
+            SET password='$password'
+            WHERE staff_id=$id;
+            
+            ";
+
+            $result=mysqli_query($link,$query);
+
+            if($result)
+            {
+                $sucess=$sucess."The password reset has been successful.<br>";
+            }
+            
+            
+
+
+
+        }
+
+
+
+
+    }
 
 
 
@@ -96,7 +158,16 @@
  
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.20/datatables.min.js"></script>
 
- 
+  <!-- <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable( {
+                "processing": true,
+                "serverSide": true,
+                "ajax": "../testDataTable.php"
+            } );
+        } );
+    </script> -->
+
 
   
 
@@ -135,7 +206,7 @@
           <span>Letters</span></a>
       </li>
 
-      <li class="nav-item active">
+      <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
           <i class="fas fa-user-tie"></i>
           <span>Manage Faculties</span>
@@ -143,7 +214,7 @@
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">You can:</h6>
-            <a class="collapse-item active" href="verify.php"><i class="fas fa-user-check"></i>
+            <a class="collapse-item" href="verify.php"><i class="fas fa-user-check"></i>
           <span> Verify Faculties</span></a>
           <a class="collapse-item" href="updateFaculty.php"><i class="fas fa-user-edit"></i>
           <span> Update Faculties</span></a>
@@ -153,7 +224,7 @@
         </div>
       </li>
 
-      <li class="nav-item">
+      <li class="nav-item active">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse3" aria-expanded="true" aria-controls="collapse3">
           <i class="fas fa-user-tie"></i>
           <span>Manage Staff</span>
@@ -163,12 +234,11 @@
             <h6 class="collapse-header">You can:</h6>
             <a class="collapse-item" href="createStaff.php"><i class="fas fa-user-check"></i>
           <span> Create Staff Account</span></a>
-          <a class="collapse-item" href="updateStaff.php"><i class="fas fa-user-edit"></i>
+          <a class="collapse-item active" href="updateStaff.php"><i class="fas fa-user-edit"></i>
           <span> Update Staff Account</span></a>
           </div>
         </div>
       </li>
-
       
 
       <!-- Divider -->
@@ -196,10 +266,11 @@
             <i class="fa fa-bars"></i>
           </button>
 
-         
-
+          
           <!-- Topbar Navbar -->
           <ul class="navbar-nav ml-auto">
+
+            
 
             <div class="topbar-divider d-none d-sm-block"></div>
 
@@ -238,130 +309,112 @@
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
-
-          <!-- Page Heading -->
-          <h1 class="h3 mb-2 text-gray-800 text-center">Faculty Lists</h1>
-          <p class="mb-4 text-center">See faculty lists to know which faculty is needed to be verified.</p>
+        <h1 class="h3 mb-2 text-gray-800 text-center">Reset Password</h1>
+          <p class="mb-4 text-center">Reset password of a staff account if forgotten. </p>
 
           <!-- DataTales Example -->
           <div class="card shadow mb-4">
             <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary text-center">Faculties</h6>
+              <h6 class="m-0 font-weight-bold text-primary text-center">Staff Account</h6>
             </div>
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-bordered text-center" id="dataTable" width="100%" cellspacing="0" style="font-size: 13px;">
-                  <thead>
-                    <tr>
-                      <th>Teacher ID</th>
-                      <th>Name(English)</th>
-                      <th>Name(Bangla)</th>
-                      <th>Department/Institute</th>
-                      <th>Designation</th>
-                      <th>Email address</th>
-                      <th>Phone Number</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
 
-                  <tbody>
-                      <?php
-                      
-                      
-
-                      $tempQuery="
-                      
-                      SELECT * FROM `signedfaculty`
-                      
-                      
-                      ";
-
-                      $result=mysqli_query($link,$tempQuery);
-                      while($row=mysqli_fetch_array($result))
-
-                      {
-
-                        
-                        echo "<tr>
-                        
-                        <td>".$row['teacher_id']."</td>
-                        <td>".$row['nameEng']."</td>
-                        <td>".$row['nameBang']."</td>
-                        <td>".$row['dept']."</td>
-                        <td>".$row['designation']."</td>
-                        <td>".$row['email']."</td>
-                        <td>".$row['phone']."</td>
-                       
-                        
-                        ";
-
-                        if($row['status'] ==0)
-                        {
-                            
-                            
-                          $tid=$row['teacher_id'];
-                        
-                          echo "<td class='x'>
-
-                            
-                            
-                            
-                            <a href='verify.php?tid=$tid' class='btn btn-danger text-center' style='font-size:13px;'>Verify</a>
-                            
-                           
-
-                            </td>";
-                            
-                            
-
-                            
-
-                           
+        <div class="container card-body" style="background-color:none ;">
 
 
-                        }
-                        else if($row['status']==1)
-                        {
-                            echo "
-                            
-                            <td class='text-center text-success'>
+    <div class="col-md-7 col-lg-6 ml-auto text-center">
 
-                                <strong>Verified</strong>
-                            
-                            </td>
-                            
-                            ";
-                        }
+    <?php
 
-                        $tid='';
 
-                      }
-                      
-                      
-                      
-                      ?>
-                      </tr>
-                      
-                  </tbody>
+            if(!empty($error))
+            {
 
-                  <tfoot>
-                    <tr>
-                    <th>Teacher ID</th>
-                      <th>Name(English)</th>
-                      <th>Name(Bangla)</th>
-                      <th>Department/Institute</th>
-                      <th>Designation</th>
-                      <th>Email address</th>
-                      <th>Phone Number</th>
-                      <th>Status</th>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
-          </div>
+                echo '
+            
+            <div class="alert alert-danger"><strong>'.$error.'</strong></div>
+            
+            ';
 
+            }
+
+            else if(!empty($sucess))
+            {
+
+                echo '
+            
+            <div class="alert alert-success"><strong>'.$sucess.'</strong></div>
+            
+            ';
+
+            }
+
+
+    ?>
+
+
+
+
+    </div>
+    <div class="row py-5 mt-4 align-items-center">
+        
+        <div class="col-md-5 pr-lg-5" style="margin-bottom: 1rem;">
+            <img src="../logo.png" alt="" class="img-fluid mb-3 d-none d-md-block" style="margin-left:6rem;">
+            <div class="display-4 text-center mb-3 mr-5 text-center" style="font-size:35px; margin-left:0.7em;">Reset Password</div>
+            <p class="text-muted mb-0 mr-5 text-center" style="margin-left: 2.1em;">Only For General Staff</p>
         </div>
+
+        <!-- Registration Form -->
+        <div class="col-md-7 col-lg-6 ml-auto">
+            <form action="#" method="POST">
+                <div class="row">
+
+
+                    <!-- Staff ID -->
+                    
+                    <div class="input-group col-lg-8 mx-auto mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-md border-right-0">
+                                    <i class="fas fa-id-badge"></i>
+                            </span>
+                        </div>
+                        <input id="staffId" type="text" name="staff_id" placeholder="Staff ID" class="form-control bg-white border-left-0 border-md">
+                    </div>
+
+                    
+
+                    
+
+                    <!-- Password -->
+                    <div class="input-group col-lg-8 mx-auto mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-md border-right-0">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                        </div>
+                        <input id="password" type="password" name="password" placeholder="New Password" class="form-control bg-white border-left-0 border-md">
+                    </div>
+                    <!--Confirm Password -->
+                    <div class="input-group col-lg-8 mx-auto mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-md border-right-0">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                        </div>
+                        <input id="passwordconf" type="password" name="password_conf" placeholder="Confirm New Password" class="form-control bg-white border-left-0 border-md">
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-group col-lg-5 mx-auto mb-0" style="margin-top: 5px;">
+                        <button type="submit" class="btn btn-primary btn-block py-2" name="reset">
+                            <span class="font-weight-bold">Reset</span>
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
         <!-- /.container-fluid -->
 
       </div>
