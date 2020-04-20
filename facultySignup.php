@@ -378,7 +378,7 @@
                                     <i class="fas fa-user-tie text-muted"></i>
                             </span>
                         </div>
-                        <select id="desig" name="designation" class="form-control bg-white border-left-0 border-md h-100 font-weight-bold text-muted">
+                        <select id="desig" name="designation" class="custom-select form-control bg-white border-left-0 border-md h-100 font-weight-bold text-muted">
                             <option value="" hidden selected>Designation</option>
                             <option value="প্রভাষক">Lecturer</option>
                             <option value="সহকারী অধ্যাপক">Assistant Professor</option>
