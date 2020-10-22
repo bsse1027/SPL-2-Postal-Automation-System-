@@ -57,7 +57,7 @@
             
             $_SESSION['staff_id']=$id;
             $_SESSION['password']=$logPassword;
-            header("Location:login.php");
+            header("Location:staffLogin");
 
         }
 

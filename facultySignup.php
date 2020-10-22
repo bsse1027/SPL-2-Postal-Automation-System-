@@ -6,6 +6,8 @@
     $sucess="";
     $error="";
     $errorFlag=0;
+    $pattern="/.du.ac.bd/i";
+    $num=mt_rand(10000000,99999999);
 
     if(isset($_POST['create']))
     {
@@ -25,13 +27,13 @@
             $error=$error."You need to provide your name in Bangla.<br>";
 
         }
-        else if($_POST['teacher_id'] == ""  || !is_numeric( $_POST['teacher_id']) )
+        // else if($_POST['teacher_id'] == ""  || !is_numeric( $_POST['teacher_id']) )
         
-        {
-            $errorFlag++;
-            $error=$error."You need to provide your valid teacher ID.<br>";
+        // {
+        //     $errorFlag++;
+        //     $error=$error."You need to provide your valid teacher ID.<br>";
 
-        }
+        // }
 
 
         else if($_POST['dept_name'] == "")
@@ -92,11 +94,30 @@
             $error=$error."Invalid email address.<br>";
          }
 
+         else if(preg_match($pattern,$_POST['email'])==0)
+         {
+             $errorFlag++;
+             $error=$error."du.ac.bd email is needed";
+         }
+
+         $dept_id=mysqli_real_escape_string($link,$_POST['dept_name']);
+         $tempQuery='SELECT * 
+         FROM `dept_table`
+         WHERE dept_id="'.$dept_id.'"
+         
+         
+         ';
+         $temp=mysqli_query($link,$tempQuery);
+         $angry=mysqli_fetch_array($temp);
+         $deptErNam=$angry['dept_name'];
+
+        
+
         $email=mysqli_real_escape_string($link,$_POST['email']);
         $firstname=mysqli_real_escape_string($link,$_POST['firstname_english']);
         $lastname=mysqli_real_escape_string($link,$_POST['firstname_bangla']);
-        $id=mysqli_real_escape_string($link,$_POST['teacher_id']);
-        $dept=mysqli_real_escape_string($link,$_POST['dept_name']);
+        $id=$num;
+        $dept=$deptErNam;
         $phone=mysqli_real_escape_string($link,$_POST['phone']);
         $password=md5(mysqli_real_escape_string($link,$_POST['password'])) ;
         $designation=mysqli_real_escape_string($link,$_POST['designation']);
@@ -109,18 +130,24 @@
         if(mysqli_num_rows($temp) > 0)
         {
               $errorFlag++;
-              $error=$error."This email is already taken <br>";
+              $error=$error."You are already registered. <br>";
         }
 
         $tempQuery='SELECT * FROM `signedfaculty` WHERE teacher_id="'.$id.'"';
       
         $temp=mysqli_query($link,$tempQuery);
         
-        if(mysqli_num_rows($temp) > 0)
-        {
-              $errorFlag++;
-              $error=$error."You have already registered.Please login to update your informations.<br>";
-        }
+         if(mysqli_num_rows($temp) > 0)
+         {
+               $errorFlag++;
+               $error=$error."Some Error occurred. Please Try Again.<br>";
+         }
+
+         $anotherLink=mysqli_connect('localhost','root','','faculty');
+         $tempQuery='SELECT * FROM `teacher` WHERE email="'.$email.'"';
+         $temp=mysqli_query($anotherLink,$tempQuery);
+         $shouldAddAsNew=mysqli_num_rows($temp);
+
 
 
 
@@ -130,12 +157,23 @@
         {
             $query="
 
-            INSERT INTO `signedfaculty` (`teacher_id`, `nameEng`, `nameBang`, `dept`,`designation`, `email`, `phone`, `password`) VALUES ('$id', '$firstname', '$lastname', '$dept','$designation', '$email', '$phone', '$password')
+            INSERT INTO `signedfaculty` (`teacher_id`,`nameEng`, `nameBang`, `dept`,`designation`, `email`, `phone`, `password`) VALUES ('$id','$firstname', '$lastname', '$dept','$designation', '$email', '$phone', '$password')
             LIMIT 1
             
             ";
 
+            if($shouldAddAsNew == 0)
+            {
+                $anotherQuery="
+                INSERT INTO `teacher`(`t_name`, `email`, `mobile_no`, `department`, `designation`,`tid`) VALUES ('$lastname','$email','$phone','$dept','$designation','$dept_id')
+                ";
+                $anotherResult=mysqli_query($anotherLink,$anotherQuery);
+            }
+
             $result=mysqli_query($link,$query);
+            
+
+            
 
             if($result)
             {
@@ -366,7 +404,7 @@
                                     <i class="fas fa-id-badge text-muted"></i>
                             </span>
                         </div>
-                        <input id="teacherId" type="text" name="teacher_id" placeholder="Teacher ID" class="form-control bg-white border-left-0 border-md">
+                        <input id="teacherId" type="text" name="teacher_id" placeholder="<?php echo $num ?>" class="form-control bg-white border-left-0 border-md" disabled>
                     </div>
 
 
@@ -395,7 +433,13 @@
                                     <i class="fas fa-university text-muted"></i>
                             </span>
                         </div>
-                        <input id="dept" type="text" name="dept_name" placeholder="Department/Institute Name" class="form-control bg-white border-left-0 border-md">
+                        <select id="dept" name="dept_name" class="custom-select form-control bg-white border-left-0 border-md h-100 font-weight-bold text-muted">
+                            <option value="" hidden selected>Department Name</option>
+                            <option value="3">ইতিহাস বিভাগ</option>
+                            <option value="1">মনোবিজ্ঞান বিভাগ </option>
+                            <option value="2">বাংলা বিভাগ</option>
+                            <option value="4">তথ্যপ্রযুক্তি ইন্সটিউট</option>
+                        </select>
                     </div>
 
                     <!-- Email Address -->
@@ -480,7 +524,9 @@
 
 
             <div class="footer-copyright text-center" style="margin-top:30vh ; color:white;">© 2020 Copyright:
-                <a href="https://du.ac.bd"> University of Dhaka</a>
+                <a href="https://du.ac.bd"> University of Dhaka</a><br>
+                Developed By:<a href = "mailto: bsse1027@iit.du.ac.bd">Ifti</a>&<a href = "mailto: bsse1018@iit.du.ac.bd">Shamma</a><br>
+                Supervised By:<a href = "mailto: abdus.satter@iit.du.ac.bd">AS Rifat</a>
             </div>
     
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

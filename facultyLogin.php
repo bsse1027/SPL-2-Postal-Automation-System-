@@ -16,15 +16,15 @@
 
     if (isset($_POST['log_in'])) {
 
-        $id=mysqli_real_escape_string($link,$_POST['teacher_id']);
+        $email=mysqli_real_escape_string($link,$_POST['email']);
         $logPassword=md5(mysqli_real_escape_string($link,$_POST['password']));
 
         
 
-        $idQuery="
+        $emailQuery="
         
             SELECT * FROM `signedfaculty`
-            WHERE teacher_id='$id';
+            WHERE email='$email';
         
         
         ";
@@ -33,16 +33,16 @@
         
             SELECT * FROM `signedfaculty`
             WHERE password='$logPassword'
-            AND teacher_id='$id'
+            AND email='$email'
             ;
         
         
         ";
 
-        $idAunthenticate=mysqli_query($link,$idQuery);
+        $emailAunthenticate=mysqli_query($link,$emailQuery);
         $passwordAunthenticate=mysqli_query($link,$passQuery);
 
-        $result1 = mysqli_num_rows($idAunthenticate);
+        $result1 = mysqli_num_rows($emailAunthenticate);
         $result2=mysqli_num_rows($passwordAunthenticate);
 
         if( $result1 == 0){
@@ -69,7 +69,7 @@
             $statusQuery="
     
                 SELECT status FROM `signedfaculty`
-                WHERE teacher_id=$id;
+                WHERE email='$email';
                 
                 ";
             
@@ -92,16 +92,16 @@
                     if($_POST['check'])
                     {
 
-                        setcookie("teacher_id","$id",time()+86400*30,"/");
+                        setcookie("email","$email",time()+86400*30,"/");
                         setcookie("password","$logPassword",time()+ 86400*30,"/");
 
                     }
                     
                     
                     
-                    $_SESSION['teacher_id']=$id;
+                    $_SESSION['email']=$email;
                     $_SESSION['password']=$logPassword;
-                    header("Location:login.php");
+                    header("Location:facultyLogin");
 
                 }
             
@@ -298,15 +298,15 @@
                 <div class="row">
 
 
-                    <!-- Teacher ID -->
+                    <!-- Email -->
                     
                     <div class="input-group col-lg-8 mx-auto mb-4">
                         <div class="input-group-prepend">
-                            <span class="input-group-text bg-white px-4 border-md border-right-0">
-                                    <i class="fas fa-id-badge text-muted"></i>
-                            </span>
-                        </div>
-                        <input id="teacherId" type="text" name="teacher_id" placeholder="Teacher ID" class="form-control bg-white border-left-0 border-md">
+                                <span class="input-group-text bg-white px-4 border-md border-right-0">
+                                    <i class="fa fa-envelope text-muted"></i>
+                                </span>
+                            </div>
+                            <input id="email" type="email" name="email" placeholder="Email Address" class="form-control bg-white border-left-0 border-md">
                     </div>
 
                     
@@ -367,7 +367,9 @@
 
 
             <div class="footer-copyright text-center" style="margin-top:30vh ; color:white;">© 2020 Copyright:
-                <a href="https://du.ac.bd"> University of Dhaka</a>
+                <a href="https://du.ac.bd"> University of Dhaka</a><br>
+                Developed By:<a href = "mailto: bsse1027@iit.du.ac.bd">Ifti</a>&<a href = "mailto: bsse1018@iit.du.ac.bd">Shamma</a><br>
+                Supervised By:<a href = "mailto: abdus.satter@iit.du.ac.bd">AS Rifat</a>
             </div>
     
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

@@ -322,7 +322,9 @@
 
 
             <div class="footer-copyright text-center" style="margin-top:30vh ; color:white;">© 2020 Copyright:
-                <a href="https://du.ac.bd"> University of Dhaka</a>
+                <a href="https://du.ac.bd"> University of Dhaka</a><br>
+                Developed By:<a href = "mailto: bsse1027@iit.du.ac.bd">Ifti</a>&<a href = "mailto: bsse1018@iit.du.ac.bd">Shamma</a><br>
+                Supervised By:<a href = "mailto: abdus.satter@iit.du.ac.bd">AS Rifat</a>
             </div>
     
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

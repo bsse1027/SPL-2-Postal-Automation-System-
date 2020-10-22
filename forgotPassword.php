@@ -40,7 +40,7 @@
 
         $nameQuery="
         
-            SELECT last_name FROM `signedfaculty`
+            SELECT nameEng FROM `signedfaculty`
             WHERE email='$email';
         
         
@@ -50,7 +50,7 @@
 
         $row=mysqli_fetch_array($nameAuthenticate);
 
-        $name=$row['last_name'];
+        $name=$row['nameEng'];
 
         $emailAunthenticate=mysqli_query($link,$emailQuery);
 
@@ -79,7 +79,7 @@
 
             $to = $email; 
             $from = 'db28111997@gmail.com'; 
-            $fromName = "ICT-Cell,University Of Dhaka"; 
+            $fromName = "Exam Controller Office,University Of Dhaka"; 
              
             $subject = "Reset Password"; 
              
@@ -567,7 +567,7 @@
                                     </table>
                                     <p style="font-size: 16px; line-height: 1.625; color: #51545E; margin: .4em 0 1.1875em;">For security, this request was received from a <a>'. $obj->showInfo("os") .'</a> device using <a>'. $obj->showInfo("browser").'</a>. If you did not request a password reset, please ignore this email or <a href="" style="color: #3869D4;">contact support</a> if you have questions.</p>
                                     <p style="font-size: 16px; line-height: 1.625; color: #51545E; margin: .4em 0 1.1875em;">Thanks,
-                                      <br />ICT Cell,University Of Dhaka.</p>
+                                      <br />Exam Controller Office,University Of Dhaka.</p>
                                   </div>
                                 </td>
                               </tr>
@@ -581,7 +581,7 @@
                                 <td class="content-cell" align="center" style="word-break: break-word; font-family: &quot;Nunito Sans&quot;, Helvetica, Arial, sans-serif; font-size: 16px; padding: 45px;">
                                   <p class="f-fallback sub align-center" style="font-size: 13px; line-height: 1.625; text-align: center; color: #A8AAAF; margin: .4em 0 1.1875em;" align="center">© 2020 [Postal Automation System]. All rights reserved.</p>
                                   <p class="f-fallback sub align-center" style="font-size: 13px; line-height: 1.625; text-align: center; color: #A8AAAF; margin: .4em 0 1.1875em;" align="center">
-                                    ICT Cell
+                                    Exam Controller Office
                                     <br />Registrar Building
                                     <br />University Of Dhaka.
                                   </p>
